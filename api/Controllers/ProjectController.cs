@@ -17,7 +17,16 @@ namespace api.Controllers
 
         public ProjectController(ProjectService projectService)
         {
-            this._projectService = projectService;
+            _projectService = projectService;
+        }
+
+        [HttpGet("projects-of-emplyee")]
+        [SwaggerGroupAttribute("v1-employee")]
+        public async Task<ActionResult<List<Project>>> GetProjectOfEmployees(int employeeId)
+        {
+            
+            var projects = await _projectService.GetProjectsIdOfEmployee(employeeId);
+            return Ok(projects);
         }
 
         [HttpGet("projects")]
@@ -47,7 +56,7 @@ namespace api.Controllers
             return Ok(projects);
         }
 
-        [HttpPut]
+        [HttpPut("project-deactive")]
         [SwaggerGroupAttribute("v1-pr-manager")]
         public async Task<ActionResult<Project>> DeactiveProject(int id)
         {
@@ -56,21 +65,25 @@ namespace api.Controllers
         }
 
 
-        [HttpPost("project")]
-        [SwaggerGroupAttribute("v1-pr-manager")]
-        public async Task<ActionResult<Project>> createProject(Project project)
-        {
-                    var Project = await _projectService.createProject(project);
-                    return Ok(Project);          
-        }
+       
 
+        [HttpPut("project-update")]
+        [SwaggerGroupAttribute("v1-pr-manager")]
         public async Task<ActionResult<Project>> UpdatePorject(int id, [FromBody]ProjectDto project)
         {
-            var updatedProject = _projectService.UpdateProject(id, project);
+            var updatedProject = await _projectService.UpdateProject(id, project);
             return Ok(updatedProject);
         }
 
-        
+        [HttpPost("project-create")]
+        [SwaggerGroupAttribute("v1-pr-manager")]
+        public async Task<ActionResult<Project>> createProject(Project project)
+        {
+            var Project = await _projectService.createProject(project);
+            return Ok(Project);
+        }
+
+
 
     }
 }

@@ -83,7 +83,7 @@ namespace api.Services
             if(request.Status!= Enums.LeaveRequestStatus.New)
                 throw new ArgumentException("Only New Requests can be submitted");
 
-            request.Status = Enums.LeaveRequestStatus.Submitted;
+            request.Status = LeaveRequestStatus.Submitted;
             await _leaveRequestRepository.Update(request);
 
             ApprovalRequest approvalRequest = new()
@@ -95,6 +95,7 @@ namespace api.Services
                 Comment = String.Empty,
             };
 
+            approver.AprovalRequest.Add(approvalRequest);
             await _context.AddAsync(approvalRequest);
             await _context.SaveChangesAsync();
             return request;

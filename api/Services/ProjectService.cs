@@ -5,6 +5,7 @@ using api.Filters;
 using api.Models;
 using api.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace api.Services
 {
@@ -24,6 +25,7 @@ namespace api.Services
             _context = context;
         }
 
+
         public async Task<bool> addProjectToEmployee(int employeeId, int projectId)
         {
             var project = await _projectRepository.GetByIdAsync(projectId);
@@ -36,7 +38,15 @@ namespace api.Services
             {
                 throw new ArgumentException("Employee not Found");
             }
-
+            if (employee.Position == Position.PROJECT_MANAGER && employee.ID != project.ProjectManagerId)
+            {
+                throw new ArgumentException("Project already has a project manager");
+            }
+            if (employee.Projects.Contains(project))
+            {
+                throw new Exception("The employee already take part in this project");
+            }
+            employee.Projects.Add(project);
 
             var newAssignment = new EmployeeProject
             {
@@ -62,7 +72,7 @@ namespace api.Services
                 throw new ArgumentException("Employee not Found");
             }
 
-
+            employee.Projects.Remove(project);
             var newAssignment = new EmployeeProject
             {
                 EmployeeId = empId,
@@ -136,8 +146,14 @@ namespace api.Services
         }
 
 
-
-
+        public async Task<List<int>> GetProjectsIdOfEmployee(int employeeId)
+        {
+            Employee employee = await _employeeService.GetEmployeeByIdAsync(employeeId);
+            return employee.EmployeeProjects
+            .Where(ep => ep.EmployeeId == employeeId)
+            .Select(ep => ep.ProjectId)
+            .ToList();
+        }
 
         public async Task<Project> createProject(Project project)
         {
@@ -157,7 +173,8 @@ namespace api.Services
             project1.ProjectManagerId = project.ProjectManagerId;
             project1.Comment = project.Comment;
             project1.Status = project.Status;
-          
+            await _employeeService.AddEmployeeToProject(project1.ID, project.ProjectManagerId);
+                  
 
             return await _projectRepository.AddAsync(project1);
         }

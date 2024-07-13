@@ -17,27 +17,15 @@ namespace api.Data
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Tutaj mo¿esz dodaæ dodatkowe konfiguracje modelu, jeœli s¹ potrzebne
             base.OnModelCreating(modelBuilder);
 
-            /*modelBuilder.Entity<Employee>(entity =>
-            {
-                entity.HasKey(a => a.ID);
-            });
-
-            modelBuilder.Entity<LeaveRequest>(entity =>
-            {
-                entity.HasKey(a => a.ID);
-                entity.HasOne(a => a.Employee).WithMany(a => a.LeaveRequests).HasForeignKey(a => a.EmployeeId);
-            });
-            */
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.HasKey(e => e.ID);
                 entity.HasMany(e => e.LeaveRequests)
                       .WithOne(lr => lr.Employee)
                       .HasForeignKey(lr => lr.EmployeeId)
-                      .OnDelete(DeleteBehavior.Restrict); // Zmieniono na Restrict, aby unikn¹æ przypadkowego usuniêcia wniosków
+                      .OnDelete(DeleteBehavior.Restrict); 
             });
 
             modelBuilder.Entity<LeaveRequest>(entity =>
@@ -50,7 +38,7 @@ namespace api.Data
 
                 entity.HasOne(lr => lr.ApprovalRequest)
                       .WithOne()
-                      .HasForeignKey<ApprovalRequest>(ar => ar.LeaveRequestId); // Zak³adaj¹c, ¿e ApprovalRequest ma LeaveRequestId
+                      .HasForeignKey<ApprovalRequest>(ar => ar.LeaveRequestId);
             });
 
             modelBuilder.Entity<EmployeeProject>(entity =>

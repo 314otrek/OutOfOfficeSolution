@@ -36,7 +36,7 @@ namespace api.Models
         public ICollection<ApprovalRequest> AprovalRequest { get; set; } = new List<ApprovalRequest>();
         [JsonIgnore]
         public ICollection<EmployeeProject> EmployeeProjects { get; set; } = new List<EmployeeProject>();
-        [JsonIgnore]
+        
         public ICollection<Project> Projects { get; set; } = new List<Project>();
     }
 }

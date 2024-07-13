@@ -31,28 +31,13 @@ namespace api.Controllers
             return Ok(employess);
         }
 
-        [SwaggerGroupAttribute("v1-employee")]
-        [HttpGet("projects-of-employees")]
-        public async Task<ActionResult<List<Project>>> getProjectOfEmployee([FromHeader]int id)
-        {
-             List<Project> projects = await _employeService.getProjectsOfEmployee(id);
-            return Ok(projects);
-        }
-
-
         [SwaggerGroupAttribute("v1-pr-manager", "v1-hr")]
-        [HttpGet("employee/{id}")]
+        [HttpGet("employee-id")]
         public async Task<ActionResult<List<Employee>>> GetEmplyeeById(int employeId)
         {
-            try
-            {
                 var employee = await _employeService.GetEmployeeByIdAsync(employeId);
-                return Ok(employee);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
+                 return Ok(employee);  
+           
         }
 
         [HttpGet("employee-sorted")]
@@ -101,11 +86,11 @@ namespace api.Controllers
 
 
 
-        [HttpPut]
-        [SwaggerGroupAttribute("v1-pr-manager", "v1-hr")]
-        public async Task<ActionResult<Employee>> InActivaeEmployee(int id)
+        [HttpPut("deactive-employee")]
+        [SwaggerGroupAttribute("v1-hr")]
+        public async Task<ActionResult<Employee>> DeactiveEmployee(int id)
         {
-            var employee = await _employeService.UnActivateEmployee(id);
+            var employee = await _employeService.DeativeEmployee(id);
             return Ok(employee);
         }
 
@@ -118,7 +103,7 @@ namespace api.Controllers
         }
 
 
-        [HttpPost("employee")]
+        [HttpPost("create-employee")]
         [SwaggerGroupAttribute("v1-hr")]
         public async Task<ActionResult<Employee>> CreateEmployee([FromBody] Employee employee)
         {

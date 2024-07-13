@@ -42,24 +42,6 @@ namespace api.Services
             return await _employeeRepository.GetAllAsync();
         }
 
-        public async Task<List<Project>> getProjectsOfEmployee(int id)
-        {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
-            {
-                throw new KeyNotFoundException("Employee with id not found");
-            }
-
-            return employee.Projects.ToList();
-            
-        }
-
-        public async Task<Employee> AddEmployeeAsync(Employee employee)
-        {
-            return await _employeeRepository.AddAsync(employee);
-        }
-
         public  Task<Employee> GetEmployeeByIdAsync(int id)
         {
             var employee =  _employeeRepository.GetByIdAsync(id);
@@ -70,7 +52,7 @@ namespace api.Services
             return employee;
         }
 
-        public async Task<Employee> UnActivateEmployee(int id)
+        public async Task<Employee> DeativeEmployee(int id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
              if (employee== null)
@@ -88,7 +70,6 @@ namespace api.Services
 
             Employee emp = new Employee();
             
-                emp.ID = default;
             emp.FullName = employee.FullName;
             emp.Subdivision = employee.Subdivision;
             emp.Position = employee.Position;
@@ -151,7 +132,6 @@ namespace api.Services
             await _employeeRepository.SaveChangesAsync();
             return employee;
 
-
         }
 
         public async Task<Employee> AddEmployeeToProject(int projectId, int employeeId)
@@ -164,26 +144,28 @@ namespace api.Services
             if (project == null)
                 throw new KeyNotFoundException("Project with ID not found.");
 
-            if (employee.Position == Position.PROJECT_MANAGER || employee.ID == project.ProjectManagerId)
+            if (employee.Position == Position.PROJECT_MANAGER && employee.ID != project.ProjectManagerId)
             {
                 throw new ArgumentException("Project already has a project manager");
             }
 
 
-                EmployeeProject entity = new()
+            if (employee.Projects.Contains(project))
             {
-                Id = default,
+                throw new Exception("The employee already take part in this project");
+            }
+
+
+            EmployeeProject entity = new()
+            {
                 EmployeeId = employeeId,
                 ProjectId = projectId,
             };
-
-            if (employee.Projects.Contains(project)) {
-                throw new Exception("The employee already take part in this project");    
-            }
             employee.Projects.Add(project);
-            await _employeeRepository.SaveChangesAsync();
-            var res = await _employeeProjectRepository.AddAsync(entity);
+            await _employeeRepository.UpdateAsync(employee);
+            await _employeeProjectRepository.AddAsync(entity);
             employee = await _employeeRepository.GetByIdAsync(employeeId);
+            await _employeeRepository.SaveChangesAsync();
             return employee;
         }
 

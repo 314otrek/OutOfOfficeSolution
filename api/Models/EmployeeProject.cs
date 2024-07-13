@@ -13,14 +13,14 @@ namespace api.Models
         [Required]
         public int EmployeeId { get; set; }
 
-        [ForeignKey("EmployeeId")]
         [JsonIgnore]
-        public  Employee Employee { get; set; }
+        public virtual Employee? Employee { get; set; }
 
         [Required]
         [JsonIgnore]
         public int ProjectId { get; set; }
+
         [JsonIgnore]
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
     }
 }
